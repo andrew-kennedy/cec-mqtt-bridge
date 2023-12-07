@@ -94,6 +94,13 @@ begin
 end
 ```
 
+# Podman/Docker build
+To build and run the Docker image on a raspberry pi, you can run the following commands:
+```
+podman build -t cec-mqtt-bridge -f Dockerfile
+podman run -it --rm -e MQTT_BROKER=<broker ip address> -e CEC_ENABLED=1 -e CEC_PORT=RPI -e CEC_ID=1 --device /dev/cec0 --device /dev/cec1 --group-add keep-groups --privileged --name cec-mqtt-bridge cec-mqtt-bridge
+```
+
 # Interesting links
 * https://github.com/nvella/mqtt-cec
 * http://www.cec-o-matic.com/

@@ -1,18 +1,14 @@
-FROM jonaseck/rpi-raspbian-libcec-py
+FROM docker.io/balenalib/raspberrypi4-64-debian-python:latest-bookworm-build
 
-RUN sed -i '/jessie-updates/d' /etc/apt/sources.list  # Now archived
-RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
+# This balena image doesn't seem to have pip properly configured, so install it here.
+RUN install_packages libcec6 libcec-dev python3-cec python3-paho-mqtt python3-pip
 
-RUN apt-get update \
- && apt-get install -qqy libxrandr2 lirc liblircclient-dev \
- && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
+COPY requirements.txt ./
 
-COPY requirements.txt /usr/src/app/
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN python -m venv --system-site-packages .
+RUN ./bin/pip install --no-cache-dir -r requirements.txt
 
-COPY . /usr/src/app
+COPY . .
 
-CMD ["python", "bridge.py"]
+CMD [ "./bin/python", "./bridge.py" ]
